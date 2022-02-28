@@ -56,10 +56,6 @@ class TestClass(QMainWindow, ui):
 
 
 
-    def MoveWidget(self):
-        pass
-
-
 
 
 if __name__ == "__main__":
