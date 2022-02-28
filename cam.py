@@ -10,8 +10,6 @@ class Thread(QThread):
     gray_video_emit = pyqtSignal(QImage)
 
 
-    record = False
-
     changeEdge = pyqtSignal(QImage)
 
     R_video = pyqtSignal(QImage)
