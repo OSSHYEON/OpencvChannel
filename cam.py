@@ -1,22 +1,21 @@
-import numpy
 import numpy as np, cv2
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtGui import QImage
 from numpy import ndarray
 
 class Thread(QThread):
-    nd_record_video = pyqtSignal(ndarray)
-    video_emit = pyqtSignal(QImage)
-    gray_video_emit = pyqtSignal(QImage)
 
+    nd_record_video = pyqtSignal(ndarray)   # 영상 저장할 때 쓰일 시그널
+    video_emit = pyqtSignal(QImage)         # BGR-> RGB로 변환되어 송출될 컬러 시그널
+    gray_video_emit = pyqtSignal(QImage)    # GRAY SCALE로 변환되어 송출될 흑백 시그널
 
     changeEdge = pyqtSignal(QImage)
 
-    R_video = pyqtSignal(QImage)
+    R_video = pyqtSignal(QImage)            # red 채널만 분리해 송출하는 시그널
     G_video = pyqtSignal(QImage)
     B_video = pyqtSignal(QImage)
 
-    Y_video = pyqtSignal(QImage)
+    Y_video = pyqtSignal(QImage)            # yellow 색상이 되도록 r, g, b 컬러를 합성하여 송출하는 시그널
     M_video = pyqtSignal(QImage)
     C_video = pyqtSignal(QImage)
 
@@ -28,14 +27,19 @@ class Thread(QThread):
         cap = cv2.VideoCapture(0)
 
         while True:
-            ret, frame = cap.read()
+            ret, frame = cap.read() # ret은 논리값, frame은 영상 정보. frame이 있으면 ret이 true가 된다
 
             if ret:
-                rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                height, width, channel = rgb_image.shape
+                rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # BGR 채널을 RGB로 변환
+                height, width, channel = rgb_image.shape    # 컬러 채널을 높이, 너비, 컬러 채널로 분리한다
                 bytes_per_line = channel * width
-                convert_to_qt = QImage(rgb_image, width, height, bytes_per_line, QImage.Format_RGB888)
-                convert_to_gray = convert_to_qt.convertToFormat(QImage.Format_Grayscale8)
+                """
+                bytes per line? 
+                    - row 하나에 있는 바이트 수
+                    - 한 픽셀에 있는 채널 수 * row에 존재하는 픽셀 수로 구한다.                 
+                """
+                convert_to_qt = QImage(rgb_image, width, height, bytes_per_line, QImage.Format_RGB888)  # opencv 영상을 PyQt로 송출하기 위해 QImage로 변환
+                convert_to_gray = convert_to_qt.convertToFormat(QImage.Format_Grayscale8)   # 변환된 QImage, Grayscale로 변환해 송출
 
                 R, G, B = cv2.split(rgb_image)
 
